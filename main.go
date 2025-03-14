@@ -53,12 +53,12 @@ func drawCalendar(year int, month time.Month) {
 	printAt(1, 0, headerCaption, termbox.ColorYellow)
 
 	header := fmt.Sprintf("   %d年 %d月   ", year, month)
-	printAt(2, 1, header, termbox.ColorGreen)
+	printAt(2, 2, header, termbox.ColorGreen)
 
 	// 曜日
 	weekDays := []string{"日", "月", "火", "水", "木", "金", "土"}
 	for i, day := range weekDays {
-		printAt(i*4+2, 3, day, termbox.ColorCyan)
+		printAt(i*4+2, 4, day, termbox.ColorCyan)
 	}
 
 	// カレンダーの日付を取得
@@ -67,7 +67,7 @@ func drawCalendar(year int, month time.Month) {
 	daysInMonth := daysInMonth(year, month)
 
 	// 日付を描画
-	x, y := startWeekDay*4+2, 5
+	x, y := startWeekDay*4+2, 6
 	for day := 1; day <= daysInMonth; day++ {
 		printAt(x, y, fmt.Sprintf("%2d", day), termbox.ColorWhite)
 		x += 4
