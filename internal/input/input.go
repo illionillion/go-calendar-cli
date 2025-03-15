@@ -6,7 +6,9 @@ import (
 	"github.com/gdamore/tcell/v2"
 )
 
-// キー入力処理
+/*
+キー入力処理
+*/
 func HandleInput(screen tcell.Screen, year *int, month *time.Month) bool {
 	ev := screen.PollEvent()
 	switch event := ev.(type) {

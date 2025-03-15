@@ -8,7 +8,9 @@ import (
 	"github.com/illionillion/go-calendar-cli/internal/render"
 )
 
-// カレンダーを描画
+/*
+カレンダーを描画
+*/
 func DrawCalendar(screen tcell.Screen, year int, month time.Month) {
 	// キャプション
 	headerCaption := "カレンダー（十字キーで移動・Ctrl+Cで停止）"
@@ -41,7 +43,9 @@ func DrawCalendar(screen tcell.Screen, year int, month time.Month) {
 	}
 }
 
-// 指定した年・月の日数を取得
+/*
+指定した年・月の日数を取得
+*/
 func DaysInMonth(year int, month time.Month) int {
 	return time.Date(year, month+1, 0, 0, 0, 0, 0, time.Local).Day()
 }
