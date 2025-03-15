@@ -5,60 +5,67 @@ import (
 	"os"
 	"time"
 
-	"github.com/nsf/termbox-go"
+	"github.com/gdamore/tcell/v2"
 )
 
 func main() {
-	err := termbox.Init()
+	screen, err := tcell.NewScreen()
 	if err != nil {
-		fmt.Println("Failed to initialize termbox:", err)
+		fmt.Println("Failed to initialize tcell:", err)
 		os.Exit(1)
 	}
-	defer termbox.Close()
+
+	if err := screen.Init(); err != nil {
+		fmt.Println("Failed to initialize screen:", err)
+		os.Exit(1)
+	}
+	defer screen.Fini()
 
 	now := time.Now()
 	year, month := now.Year(), now.Month()
 
 	// メインループ
 	for {
-		termbox.Clear(termbox.ColorDefault, termbox.ColorDefault)
-		drawCalendar(year, month)
-		termbox.Flush()
+		screen.Clear()
+		drawCalendar(screen, year, month)
+		screen.Show()
 
-		switch ev := termbox.PollEvent(); ev.Type {
-		case termbox.EventKey:
-			switch ev.Key {
-			case termbox.KeyArrowRight, termbox.KeyArrowUp:
+		ev := screen.PollEvent()
+		switch event := ev.(type) {
+		case *tcell.EventKey:
+			switch event.Key() {
+			case tcell.KeyRight, tcell.KeyUp:
 				month++
 				if month > 12 {
 					month = 1
 					year++
 				}
-			case termbox.KeyArrowLeft, termbox.KeyArrowDown:
+			case tcell.KeyLeft, tcell.KeyDown:
 				month--
 				if month < 1 {
 					month = 12
 					year--
 				}
-			case termbox.KeyCtrlC:
+			case tcell.KeyCtrlC:
 				return
 			}
 		}
 	}
 }
 
-func drawCalendar(year int, month time.Month) {
+func drawCalendar(screen tcell.Screen, year int, month time.Month) {
 	// キャプション
 	headerCaption := "カレンダー（十字キーで移動・Ctrl+Cで停止）"
-	printAt(1, 0, headerCaption, termbox.ColorYellow)
+	printAt(screen, 1, 0, headerCaption, tcell.ColorYellow)
 
+	// ヘッダー
 	header := fmt.Sprintf("   %d年 %d月   ", year, month)
-	printAt(2, 2, header, termbox.ColorGreen)
+	printAt(screen, 2, 2, header, tcell.ColorGreen)
 
 	// 曜日
 	weekDays := []string{"日", "月", "火", "水", "木", "金", "土"}
 	for i, day := range weekDays {
-		printAt(i*4+2, 4, day, termbox.ColorCyan)
+		printAt(screen, i*4+2, 4, day, tcell.NewHexColor(0x00FFFF))
 	}
 
 	// カレンダーの日付を取得
@@ -69,7 +76,7 @@ func drawCalendar(year int, month time.Month) {
 	// 日付を描画
 	x, y := startWeekDay*4+2, 6
 	for day := 1; day <= daysInMonth; day++ {
-		printAt(x, y, fmt.Sprintf("%2d", day), termbox.ColorWhite)
+		printAt(screen, x, y, fmt.Sprintf("%2d", day), tcell.ColorWhite)
 		x += 4
 		if x > 6*4+2 {
 			x = 2
@@ -82,8 +89,9 @@ func daysInMonth(year int, month time.Month) int {
 	return time.Date(year, month+1, 0, 0, 0, 0, 0, time.Local).Day()
 }
 
-func printAt(x, y int, msg string, color termbox.Attribute) {
+func printAt(screen tcell.Screen, x, y int, msg string, color tcell.Color) {
+	style := tcell.StyleDefault.Foreground(color).Background(tcell.ColorDefault)
 	for i, r := range msg {
-		termbox.SetCell(x+i, y, r, color, termbox.ColorDefault)
+		screen.SetContent(x+i, y, r, nil, style)
 	}
 }
