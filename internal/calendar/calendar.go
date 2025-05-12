@@ -11,13 +11,13 @@ import (
 /*
 カレンダーを描画
 */
-func DrawCalendar(screen tcell.Screen, year int, month time.Month) {
+func DrawCalendar(screen tcell.Screen, year int, month time.Month, currentDay int) {
 	// キャプション
 	headerCaption := "カレンダー（十字キーで移動・Ctrl+Cで停止）"
 	render.PrintAt(screen, 1, 0, headerCaption, tcell.ColorYellow)
 
 	// ヘッダー
-	header := fmt.Sprintf("   %d年 %d月   ", year, month)
+	header := fmt.Sprintf("   %d年 %d月 %d日   ", year, month, currentDay)
 	render.PrintAt(screen, 2, 2, header, tcell.ColorGreen)
 
 	// 曜日
@@ -34,7 +34,11 @@ func DrawCalendar(screen tcell.Screen, year int, month time.Month) {
 	// 日付を描画
 	x, y := startWeekDay*4+2, 6
 	for day := 1; day <= daysInMonth; day++ {
-		render.PrintAt(screen, x, y, fmt.Sprintf("%2d", day), tcell.ColorWhite)
+		color := tcell.ColorWhite
+		if day == currentDay {
+			color = tcell.ColorRed
+		}
+		render.PrintAt(screen, x, y, fmt.Sprintf("%2d", day), color)
 		x += 4
 		if x > 6*4+2 {
 			x = 2

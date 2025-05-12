@@ -24,15 +24,15 @@ func main() {
 	defer screen.Fini()
 
 	now := time.Now()
-	year, month := now.Year(), now.Month()
+	year, month, day := now.Year(), now.Month(), now.Day()
 
 	// メインループ
 	for {
 		screen.Clear()
-		calendar.DrawCalendar(screen, year, month)
+		calendar.DrawCalendar(screen, year, month, day)
 		screen.Show()
 
-		if !input.HandleInput(screen, &year, &month) {
+		if !input.HandleInput(screen, &year, &month, &day) {
 			return
 		}
 	}
